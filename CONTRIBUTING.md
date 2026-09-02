@@ -1,12 +1,12 @@
 # Contributing to zak-skills
 
-PRs and issues welcome. This page is short on purpose — it's a one-author, one-skill repo today, and the bar should sound like that. If the collection grows, this file will too.
+PRs and issues welcome. This page is short on purpose, it's a one-author, one-skill repo today, and the bar should sound like that. If the collection grows, this file will too.
 
 ## What I'm looking for in a new skill
 
 If you want to propose one, the things I care about:
 
-- **A workflow opinion** that holds across projects and languages — not a snippet that happens to be reusable.
+- **A workflow opinion** that holds across projects and languages, not a snippet that happens to be reusable.
 - **A failure mode it prevents.** A skill should answer "what would Claude do wrong without this?" in one sentence.
 - **A clear when-to-use and when-not-to-use.** Skills that fire on everything fire usefully on nothing.
 
@@ -14,7 +14,7 @@ Things that don't fit here: code templates (use a template repo), thin CLI wrapp
 
 ## Proposing one
 
-Open an issue first with a sketch of the skill — what it does, what it prevents, two tasks where it would apply. We can shape it before either of us spends real time.
+Open an issue first with a sketch of the skill, what it does, what it prevents, two tasks where it would apply. We can shape it before either of us spends real time.
 
 A PR should include:
 

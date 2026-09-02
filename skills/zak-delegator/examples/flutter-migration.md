@@ -1,6 +1,6 @@
 # Example: Migrating a Flutter App from `StatefulWidget` to Hooks
 
-An illustrative walkthrough of applying `zak-delegator` to a mechanical, codebase-wide migration in a Flutter app. (Presented as a worked thought-experiment — your actual run will produce different file lists and a different judgement-call distribution, but the shape will look like this.)
+An illustrative walkthrough of applying `zak-delegator` to a mechanical, codebase-wide migration in a Flutter app. (Presented as a worked thought-experiment, your actual run will produce different file lists and a different judgement-call distribution, but the shape will look like this.)
 
 **Context.** A mid-size Flutter app uses `StatefulWidget` throughout. The team has decided to migrate to `flutter_hooks` for ergonomics. ~40 widgets are affected.
 
@@ -8,7 +8,7 @@ This is the scenario `zak-delegator` is best at: a high-volume, mechanical chang
 
 ---
 
-## Layer 1 — Planning (Opus, once)
+## Layer 1: Planning (Opus, once)
 
 ```markdown
 ## Step 1: Inventory and triage
@@ -34,7 +34,7 @@ This is the scenario `zak-delegator` is best at: a high-volume, mechanical chang
 ## Step 3: Convert all Group B widgets
 - Acceptance: Every Group-B widget compiles, original tests pass.
 - Testing: dart analyze + flutter test on affected files.
-- Classification: Codex (mechanical but pattern-aware — useEffect
+- Classification: Codex (mechanical but pattern-aware, useEffect
   / useState / dispose mapping).
 - Dependencies: Step 1.
 - Pipeline stage: 2.
@@ -84,7 +84,7 @@ Stage 5: Layer 4 review + commit
 
 ---
 
-## Layer 2 — Orchestration (Sonnet)
+## Layer 2: Orchestration (Sonnet)
 
 The orchestrator dispatches:
 
@@ -95,22 +95,22 @@ The orchestrator dispatches:
 
 ---
 
-## Layer 3 — Execution highlights
+## Layer 3: Execution highlights
 
 **Step 2 (Codex on Group A).** Brief includes: the list of files, the target pattern (a worked before/after on one file), the gate commands (`dart analyze`, `flutter test`), and the explicit instruction "convert exactly these files, do not touch anything else."
 
 **Step 3 (Codex on Group B).** Similar, with the worked before/after showing how `initState` maps to `useEffect(() { ... return null; }, [])` and `dispose` collapses into the cleanup return.
 
-**Step 4 (Opus on Group C).** The brief here is *open*. Opus is expected to make judgement calls: a widget that subclasses a custom base class might not be a good hook conversion candidate at all. The deliverable can include "this widget should not be migrated, because X" — that is a valid Step 4 outcome and a valuable signal from the planning round.
+**Step 4 (Opus on Group C).** The brief here is *open*. Opus is expected to make judgement calls: a widget that subclasses a custom base class might not be a good hook conversion candidate at all. The deliverable can include "this widget should not be migrated, because X", that is a valid Step 4 outcome and a valuable signal from the planning round.
 
 ---
 
-## Layer 4 — Review (Opus, once)
+## Layer 4: Review (Opus, once)
 
 Opus reads the combined diff and verifies:
 
 - Every file in the inventory was either converted or explicitly deferred (with reason).
-- No new behaviour was introduced — every conversion is a pure shape change.
+- No new behaviour was introduced, every conversion is a pure shape change.
 - The Step-4 judgement calls have reasoning attached, not just blind conversion.
 
 If clean, the human commits. Likely several commits, grouped by stage:
@@ -128,5 +128,5 @@ If clean, the human commits. Likely several commits, grouped by stage:
 
 - **Volume × mechanical = Codex's sweet spot.** Group A + Group B + Step 6 are exactly the work Codex does well.
 - **Routing reveals hidden complexity.** Group C looks like "more of the same" but is actually where real decisions live. Surfacing it as an Opus task in Layer 1 prevents the entire migration from drifting into "Sonnet guesses, you patch later."
-- **Sonnet handles the seams.** Inventory (Step 1) and test refresh (Step 5) need light reasoning but no design — Sonnet's lane.
+- **Sonnet handles the seams.** Inventory (Step 1) and test refresh (Step 5) need light reasoning but no design, Sonnet's lane.
 - **Layer 4 catches the silent failures.** A Codex job that "looks done" might have skipped a file the brief was too vague about. Re-running `dart analyze` on the full project is non-negotiable.

@@ -1,10 +1,10 @@
-# zak-delegator — Usage Guide
+# zak-delegator: Usage Guide
 
 A practical reference of ready-to-paste prompts for using the `zak-delegator` skill in any Claude Code session.
 
 ---
 
-## Step 1 — Brand new task (before brainstorming)
+## Step 1: Brand new task (before brainstorming)
 
 Use this when you don't have specs yet. Naming both skills tells Claude to load them; describing the workflow gives the trigger something concrete to match.
 
@@ -12,7 +12,7 @@ Use this when you don't have specs yet. Naming both skills tells Claude to load 
 
 ```
 I have a new task to work on. I want to use the zak-delegator
-pattern, but we're not at planning yet — first brainstorm
+pattern, but we're not at planning yet, first brainstorm
 requirements with me (use the superpowers brainstorming skill),
 then write the specs. Once specs are done, pause and wait for
 my signal before producing the implementation plan.
@@ -20,7 +20,7 @@ my signal before producing the implementation plan.
 
 ---
 
-## Step 2 — Specs are done (the critical step)
+## Step 2: Specs are done (the critical step)
 
 This is where the difference shows. The implementation plan that comes out of this step carries everything Layer 2 needs to execute mechanically.
 
@@ -53,7 +53,7 @@ The plan is missing [X]. Add it before we continue.
 
 ---
 
-## Step 3 — Execute one stage
+## Step 3: Execute one stage
 
 Run stages one at a time so you can validate before moving on.
 
@@ -81,7 +81,7 @@ When all subagents return, give me a summary per subtask:
 
 ---
 
-## Step 4 — After each stage (quick gate check)
+## Step 4: After each stage (quick gate check)
 
 Never move to a new stage before the previous one is clean.
 
@@ -99,7 +99,7 @@ Do not commit this stage on its own.
 
 ---
 
-## Step 5 — After the last stage (Layer 4 Review)
+## Step 5: After the last stage (Layer 4 Review)
 
 The final human checkpoint before commit.
 
@@ -125,7 +125,7 @@ I will take the commit decision.
 
 ## Common-problem prompts
 
-### Problem 1 — A subagent escalated
+### Problem 1: A subagent escalated
 
 **Prompt:**
 
@@ -137,7 +137,7 @@ context:
 judgement]
 ```
 
-### Problem 2 — A whole stage failed
+### Problem 2: A whole stage failed
 
 **Prompt:**
 
@@ -151,7 +151,7 @@ Diagnose the root cause:
 Propose a fix to the plan before we resume.
 ```
 
-### Problem 3 — Codex returned a strange diff
+### Problem 3: Codex returned a strange diff
 
 **Prompt:**
 
@@ -162,7 +162,7 @@ ambiguous, then use --resume-last in codex-delegate with a short
 delta brief.
 ```
 
-### Problem 4 — Gates failing in a confusing way
+### Problem 4: Gates failing in a confusing way
 
 **Prompt:**
 

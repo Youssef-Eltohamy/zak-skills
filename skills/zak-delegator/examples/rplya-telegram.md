@@ -6,7 +6,7 @@ An illustrative walkthrough of applying `zak-delegator` to a realistic feature i
 
 ---
 
-## Layer 1 — Planning (Opus, once)
+## Layer 1: Planning (Opus, once)
 
 A single Opus pass produces this plan. Note how each step carries the routing metadata Layer 2 needs.
 
@@ -76,7 +76,7 @@ Stage 4: Layer 4 review + commit
 
 ---
 
-## Layer 2 — Orchestration (Sonnet)
+## Layer 2: Orchestration (Sonnet)
 
 Sonnet executes the pipeline mechanically. No design decisions; just dispatch and collect.
 
@@ -102,7 +102,7 @@ The orchestrator embeds the same instruction in every subagent's brief:
 
 ---
 
-## Layer 3 — Execution (mixed)
+## Layer 3: Execution (mixed)
 
 **Step 1, Step 4, Step 5** go through `codex-delegate`. The orchestrator writes a focused brief for each (the goal, the file pattern to follow from the WhatsApp module, the gate commands), and Codex returns a diff in its sandbox.
 
@@ -112,7 +112,7 @@ The orchestrator embeds the same instruction in every subagent's brief:
 
 ---
 
-## Layer 4 — Review (Opus, once)
+## Layer 4: Review (Opus, once)
 
 Opus reads the combined diff, runs `npm run lint && npm test && npm run build` and confirms:
 

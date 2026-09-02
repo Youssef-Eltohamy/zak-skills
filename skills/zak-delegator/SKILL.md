@@ -1,14 +1,14 @@
 ---
 name: zak-delegator
-description: Use this skill whenever the user is about to start a non-trivial multi-step coding task — building a feature, refactoring across files, scaffolding a module, executing an implementation plan, or any work that touches multiple subtasks. Triggers on phrasings like "let's plan and build", "split this into subtasks", "orchestrate this", "delegate this", "let's execute the plan", "let's tackle this feature", or whenever the user starts work right after a specs/planning phase. Also use proactively when you see a task that would benefit from being decomposed and routed across models (Opus / Sonnet / Codex) for cost-and-speed optimization, EVEN IF the user does not explicitly ask for orchestration. Encodes a four-layer pattern (Plan → Orchestrate → Execute → Review) that ships faster while spending ~60% less on Opus tokens, with a quality safety net. Do NOT use for trivial single-file edits, one-off questions, or pure research tasks.
+description: Use this skill whenever the user is about to start a non-trivial multi-step coding task, building a feature, refactoring across files, scaffolding a module, executing an implementation plan, or any work that touches multiple subtasks. Triggers on phrasings like "let's plan and build", "split this into subtasks", "orchestrate this", "delegate this", "let's execute the plan", "let's tackle this feature", or whenever the user starts work right after a specs/planning phase. Also use proactively when you see a task that would benefit from being decomposed and routed across models (Opus / Sonnet / Codex) for cost-and-speed optimization, EVEN IF the user does not explicitly ask for orchestration. Encodes a four-layer pattern (Plan → Orchestrate → Execute → Review) that ships faster while spending ~60% less on Opus tokens, with a quality safety net. Do NOT use for trivial single-file edits, one-off questions, or pure research tasks.
 metadata:
   version: 0.1.0
-  author: Youssef Eltohamy
+  author: Youssef El-Tohamy
 ---
 
 # Zak Delegator
 
-A pattern for shipping non-trivial coding tasks fast, cheaply, and with quality protection — by routing each step to the right model instead of using one model for everything.
+A pattern for shipping non-trivial coding tasks fast, cheaply, and with quality protection, by routing each step to the right model instead of using one model for everything.
 
 You are the **orchestrator**. You decompose, route, collect, and decide. You do NOT do all the thinking yourself with the most expensive model. The whole point: route by cognitive load.
 
@@ -21,7 +21,7 @@ Two failure modes this skill prevents:
 
 This skill encodes a four-layer pattern that gives you:
 
-- **Real cost reduction**: by moving orchestration off Opus — the single biggest saver — and pushing mechanical work to Codex or Sonnet, you shave a meaningful chunk off the Opus bill on multi-step tasks. The exact saving depends on the task shape; measure your own runs before quoting a number.
+- **Real cost reduction**: by moving orchestration off Opus, the single biggest saver, and pushing mechanical work to Codex or Sonnet, you shave a meaningful chunk off the Opus bill on multi-step tasks. The exact saving depends on the task shape; measure your own runs before quoting a number.
 - **Real speedup**: pipeline-with-parallel-inside-stages, not sequential.
 - **Quality safety net**: Opus reviews the diff before commit, so cheap-model failures cannot ship.
 
@@ -29,22 +29,22 @@ This skill encodes a four-layer pattern that gives you:
 
 ## The four layers
 
-### Layer 1 — Planning (Opus, once)
+### Layer 1: Planning (Opus, once)
 
 The planning pass MUST use Opus. Quality here determines every downstream decision; cheaping out is false economy.
 
-**Compose with `superpowers:writing-plans`.** That skill defines the plan's *structure* (steps, acceptance criteria, testing notes, scope). This skill defines the *routing metadata* the plan must carry on top of that structure. Use both: invoke `writing-plans` to produce the plan in its canonical form, then ensure every step in that plan carries the three Layer-1 enrichments below. If `writing-plans` is unavailable, the planner still owes the same enrichments — they are not optional.
+**Compose with `superpowers:writing-plans`.** That skill defines the plan's *structure* (steps, acceptance criteria, testing notes, scope). This skill defines the *routing metadata* the plan must carry on top of that structure. Use both: invoke `writing-plans` to produce the plan in its canonical form, then ensure every step in that plan carries the three Layer-1 enrichments below. If `writing-plans` is unavailable, the planner still owes the same enrichments, they are not optional.
 
 The planner produces, for the given task:
 
 1. A list of atomic subtasks (one task = one brief = one commit). These map directly to `writing-plans` steps.
 2. A dependency graph: which subtask blocks which. Make this explicit, not implicit in step ordering.
-3. A classification per subtask using the 3-question classifier below — annotate each step with `→ Codex` / `→ Sonnet` / `→ Opus`.
+3. A classification per subtask using the 3-question classifier below, annotate each step with `→ Codex` / `→ Sonnet` / `→ Opus`.
 4. A pipeline of stages, with parallel-where-possible inside each stage. Group steps by which stage they belong to.
 
 The output of Layer 1 is a `writing-plans`-shaped plan, enriched so the next layers can execute it mechanically.
 
-### Layer 2 — Orchestration (Sonnet, not Opus)
+### Layer 2: Orchestration (Sonnet, not Opus)
 
 This is the biggest cost lever in the whole pattern. Orchestration itself is mechanical work:
 
@@ -54,11 +54,11 @@ This is the biggest cost lever in the whole pattern. Orchestration itself is mec
 - Advance to the next pipeline stage.
 - Handle escalations.
 
-Sonnet is sufficient and noticeably cheaper than Opus for this. Use Opus as orchestrator ONLY when the orchestration itself involves a nontrivial decision (rare — usually it does not).
+Sonnet is sufficient and noticeably cheaper than Opus for this. Use Opus as orchestrator ONLY when the orchestration itself involves a nontrivial decision (rare, usually it does not).
 
 **How the handoff actually happens.** The Opus thread that produced the Layer-1 plan does not orchestrate. It spawns a Sonnet subagent via the `Agent` tool with `model: sonnet` (or the platform's equivalent) and hands it the plan as its initial prompt. From that point on, the orchestration tokens are Sonnet tokens, not Opus tokens. The Opus thread idles until Layer 4. If you skip this handoff and let Opus orchestrate "informally" from the same thread, you keep paying Opus rates for every dispatch and the cost-saving claim of this pattern silently disappears.
 
-### Layer 3 — Execution (mixed, by classification)
+### Layer 3: Execution (mixed, by classification)
 
 Each subtask is dispatched to one of three implementers:
 
@@ -70,16 +70,16 @@ Each subtask is dispatched to one of three implementers:
 
 Inside each pipeline stage, run independent subtasks in **parallel**. Across stages, sequence them. True parallel requires no shared state between subtasks; if a subtask needs output from another, it belongs in a later stage.
 
-### Layer 4 — Review (Opus, once before commit)
+### Layer 4: Review (Opus, once before commit)
 
 Before any commit, the orchestrator escalates back to Opus for review:
 
 1. Read the full diff.
-2. Re-run the project's gates yourself — do NOT trust subagent self-reports.
+2. Re-run the project's gates yourself, do NOT trust subagent self-reports.
 3. Check scope: did each subagent do exactly what its brief said, nothing more, nothing less?
 4. Either approve commit, or send specific subtasks back for rework.
 
-The commit boundary is yours alone. Subagents never commit. Codex specifically cannot commit reliably — this is documented in the `codex-delegate` skill.
+The commit boundary is yours alone. Subagents never commit. Codex specifically cannot commit reliably, this is documented in the `codex-delegate` skill.
 
 ---
 
@@ -89,7 +89,7 @@ For each subtask, ask in order. Stop at the first "yes":
 
 1. **Can I write the spec for this subtask in 3 sentences or fewer?** → Yes: candidate for Codex (if mechanical) or Sonnet (if needs light reasoning). No: go to 2.
 2. **Is the implementation pattern obvious from existing code in the repo?** → Yes: Sonnet subagent. No: go to 3.
-3. **Does this require an architectural decision, a tricky debugging session, or resolving ambiguous requirements?** → Yes: Opus subagent. No: re-examine question 2 — you probably misclassified.
+3. **Does this require an architectural decision, a tricky debugging session, or resolving ambiguous requirements?** → Yes: Opus subagent. No: re-examine question 2, you probably misclassified.
 
 The classifier is intentionally crude. Three questions, in order. Do not invent additional axes.
 
@@ -112,7 +112,7 @@ This prevents the classic failure where Sonnet "almost gets it" for 20 minutes, 
 
 ## When to use Codex specifically
 
-Codex (via the `codex-delegate` skill) is a separate runtime — different model, different billing. Its tokens do not count against Claude usage. Note this is not "free" — it is billed by OpenAI on your Codex/ChatGPT plan or pay-as-you-go, just on a different invoice. The win is shifting mechanical work off your Claude bill, not eliminating cost.
+Codex (via the `codex-delegate` skill) is a separate runtime, different model, different billing. Its tokens do not count against Claude usage. Note this is not "free", it is billed by OpenAI on your Codex/ChatGPT plan or pay-as-you-go, just on a different invoice. The win is shifting mechanical work off your Claude bill, not eliminating cost.
 
 **Use Codex for:**
 
@@ -123,19 +123,19 @@ Codex (via the `codex-delegate` skill) is a separate runtime — different model
 
 **Do NOT use Codex for:**
 
-- Tasks small enough to do inline — the brief-writing overhead is not worth it.
-- Ambiguous bug fixes that need full codebase context — Codex sees only the brief.
-- Design decisions — Codex implements, it does not architect.
+- Tasks small enough to do inline, the brief-writing overhead is not worth it.
+- Ambiguous bug fixes that need full codebase context, Codex sees only the brief.
+- Design decisions, Codex implements, it does not architect.
 
-Codex requires writing a self-contained brief (it has no chat memory, no repo memory). Spending Opus tokens to write a precise brief is fine — it is cheaper than spending Opus tokens to implement the work itself.
+Codex requires writing a self-contained brief (it has no chat memory, no repo memory). Spending Opus tokens to write a precise brief is fine, it is cheaper than spending Opus tokens to implement the work itself.
 
 ---
 
 ## Concrete worked example
 
-Task: "Add a Telegram channel integration to a multi-channel NestJS backend, parallel to the existing WhatsApp integration." (This walkthrough is illustrative — it shows the pattern's shape on a realistic task, not a literal transcript of a single run.)
+Task: "Add a Telegram channel integration to a multi-channel NestJS backend, parallel to the existing WhatsApp integration." (This walkthrough is illustrative, it shows the pattern's shape on a realistic task, not a literal transcript of a single run.)
 
-**Layer 1 — Opus planning produces:**
+**Layer 1, Opus planning produces:**
 
 ```
 Subtasks:
@@ -172,11 +172,11 @@ Pipeline:
   Stage 4: Opus review + commit
 ```
 
-**Layer 2 — Sonnet orchestrator** runs this pipeline mechanically.
+**Layer 2, Sonnet orchestrator** runs this pipeline mechanically.
 
-**Layer 3 — execution** happens with the right tool for each subtask. C escalates back to Opus orchestrator if Sonnet's confidence drops; A/D/E are dispatched via `codex-delegate` and their diffs are collected.
+**Layer 3, execution** happens with the right tool for each subtask. C escalates back to Opus orchestrator if Sonnet's confidence drops; A/D/E are dispatched via `codex-delegate` and their diffs are collected.
 
-**Layer 4 — Opus review** reads the combined diff, runs the gates (lint, tests, build), approves the commit.
+**Layer 4, Opus review** reads the combined diff, runs the gates (lint, tests, build), approves the commit.
 
 ---
 
@@ -185,7 +185,7 @@ Pipeline:
 - **The orchestrator commits, never a subagent.** Especially not Codex (its sandbox cannot reliably write `.git`).
 - **Run the classifier on every subtask, no shortcuts.** "Looks simple" is not a classification.
 - **Subagent self-reports are claims, not evidence.** Re-run the project's gates in Layer 4 yourself.
-- **Opus is for thinking, not typing.** If you are using Opus to scaffold a module or write boilerplate, you are doing it wrong — that work goes to Codex.
+- **Opus is for thinking, not typing.** If you are using Opus to scaffold a module or write boilerplate, you are doing it wrong, that work goes to Codex.
 - **Parallel requires independence.** If two subtasks need each other's output, they belong in different pipeline stages.
 
 ---

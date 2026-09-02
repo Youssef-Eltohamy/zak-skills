@@ -1,12 +1,23 @@
-# zak-skills
+<div align="center">
+<img src=".github/banner.png" alt="zak-skills" width="100%">
 
-A collection of opinionated workflow skills for Claude Code, focused on shipping non-trivial features faster while spending fewer Opus tokens.
+**A collection of opinionated workflow skills for Claude Code, focused on shipping non-trivial features faster while spending fewer Opus tokens.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-1-green.svg)](#skills-in-this-collection)
 [![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-orange.svg)](https://docs.claude.com/en/docs/claude-code)
 
+[What this is](#what-this-is) · [Install](#installation) · [Quickstart](#quickstart) · [How it works](#how-it-works) · [Skills in this collection](#skills-in-this-collection)
+
+</div>
+
 > **Pre-1.0.** The four-layer pattern is stable and used in real work, but interfaces and edge cases will keep moving until 1.0. Pin a tag if you depend on it.
+
+---
+
+## What is a Claude Code skill
+
+A skill is a markdown file with a `description` Claude matches against your prompt; when it fires, its instructions load into the conversation and Claude follows them for that task instead of improvising from scratch.
 
 ---
 
@@ -14,14 +25,14 @@ A collection of opinionated workflow skills for Claude Code, focused on shipping
 
 A focused set of Claude Code skills that codify a single thesis: **stop using your most expensive model to do mechanical work**.
 
-The first skill in the collection — `zak-delegator` — is a four-layer orchestration pattern that splits a non-trivial task across the right model at each step:
+The first skill in the collection, `zak-delegator`, is a four-layer orchestration pattern that splits a non-trivial task across the right model at each step:
 
 - **Opus** plans once and reviews once.
 - **Sonnet** does the orchestration in between (the biggest cost lever in the pattern).
 - **Codex** does the mechanical implementation work via the `codex-delegate` companion skill.
 - **Sonnet / Opus subagents** handle the actual coding, routed by complexity.
 
-In practice, the largest saving comes from moving orchestration off Opus — orchestration touches every step, so this single switch compounds across a feature. Exact savings depend on task shape; measure your own runs before quoting a number. Speed improves through pipeline-with-parallelism, and quality is protected by a hard human checkpoint before commit.
+In practice, the largest saving comes from moving orchestration off Opus: orchestration touches every step, so this single switch compounds across a feature. Exact savings depend on task shape; measure your own runs before quoting a number. Speed improves through pipeline-with-parallelism, and quality is protected by a hard human checkpoint before commit.
 
 ---
 
@@ -34,7 +45,7 @@ Two patterns dominate Claude Code today, and both leave value on the table:
 | **Opus-for-everything** | Burns the most expensive token rate on mechanical typing. Slow, because a single context handles every step sequentially. |
 | **Sonnet-for-everything** | Cheap, but skips architectural review. Accumulates subtle design debt and silent bugs. |
 
-`zak-delegator` is the routing layer that lets you avoid both. It is not a new agent runtime, not a tool, not a framework. It is a skill — a contract Claude reads at the start of a task that tells it *how to think about the work before doing it*.
+`zak-delegator` is the routing layer that lets you avoid both. It is not a new agent runtime, not a tool, not a framework. It is a skill, a contract Claude reads at the start of a task that tells it *how to think about the work before doing it*.
 
 ---
 
@@ -63,7 +74,7 @@ cp -r zak-skills/skills/zak-delegator ~/.claude/skills/
 npx skills add amElnagdy/delegate-skills --agent claude-code
 ```
 
-`codex-delegate` requires the OpenAI Codex CLI to be installed and authenticated. See its [README](https://github.com/amElnagdy/delegate-skills) for details. `zak-delegator` works standalone as well — it will route everything through Claude subagents if Codex is unavailable.
+`codex-delegate` requires the OpenAI Codex CLI to be installed and authenticated. See its [README](https://github.com/amElnagdy/delegate-skills) for details. `zak-delegator` works standalone as well: it will route everything through Claude subagents if Codex is unavailable.
 
 ---
 
@@ -85,7 +96,7 @@ If you want to be extra explicit, the underlying Skill tool can be called direct
 Use the Skill tool to load zak-delegator, then plan my feature.
 ```
 
-Either way works — the description-matching path is the standard one.
+Either way works, the description-matching path is the standard one.
 
 ---
 
@@ -95,18 +106,18 @@ The pattern has four layers. Each layer uses the model best suited to its kind o
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Layer 1 — Planning              (Opus, once)           │
+│  Layer 1, Planning                (Opus, once)           │
 │     decompose + dependency graph + classify + pipeline  │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 2 — Orchestration         (Sonnet)               │
+│  Layer 2, Orchestration           (Sonnet)               │
 │     dispatch + collect + sequence + escalate            │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 3 — Execution             (mixed)                │
+│  Layer 3, Execution               (mixed)                │
 │     Codex (mechanical) / Sonnet (standard) / Opus (hard)│
 │     parallel within stages, sequenced across stages     │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 4 — Review                (Opus, once)           │
-│     diff + gates + scope check → human commits          │
+│  Layer 4, Review                  (Opus, once)           │
+│     diff + gates + scope check, then human commits       │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -122,7 +133,7 @@ Every subtask in the plan gets classified by answering three questions, in order
 2. **Is the pattern obvious from existing code in the repo?** → If yes, Sonnet. If no, go to question 3.
 3. **Does it require architectural judgement or hard debugging?** → If yes, Opus. If no, you misclassified at step 2; recheck.
 
-The classifier is deliberately crude. Three questions, one branch each. Resist the urge to invent more axes — they erode the rule's value.
+The classifier is deliberately crude. Three questions, one branch each. Resist the urge to invent more axes: they erode the rule's value.
 
 ---
 
@@ -145,10 +156,10 @@ Skip it when:
 
 ## Examples
 
-Two illustrative walkthroughs — realistic task shapes that show how the pattern's pieces fit together. Treat them as worked thought-experiments, not transcripts; real runs will vary in the details.
+Two illustrative walkthroughs, realistic task shapes that show how the pattern's pieces fit together. Treat them as worked thought-experiments, not transcripts; real runs will vary in the details.
 
-- **[Adding a Telegram channel to a NestJS API](skills/zak-delegator/examples/rplya-telegram.md)** — five steps, three models, one parallel stage.
-- **[Migrating a Flutter app from `StatefulWidget` to hooks](skills/zak-delegator/examples/flutter-migration.md)** — high-volume mechanical migration with hidden judgement calls.
+- **[Adding a Telegram channel to a NestJS API](skills/zak-delegator/examples/rplya-telegram.md)**: five steps, three models, one parallel stage.
+- **[Migrating a Flutter app from `StatefulWidget` to hooks](skills/zak-delegator/examples/flutter-migration.md)**: high-volume mechanical migration with hidden judgement calls.
 
 Each walkthrough covers Layer 1 → Layer 4: the plan, the dependency graph, the routing decisions, and where each layer earns its keep.
 
@@ -167,10 +178,10 @@ More skills will land in this collection over time. The bar for inclusion: a ski
 ## FAQ
 
 **How is this different from `codex-delegate`?**
-`codex-delegate` is the mechanical-implementer step — it lets you hand a single bounded task to Codex and review the diff. `zak-delegator` is the layer above: it tells Claude *when* to call `codex-delegate`, when to route to Sonnet instead, and when to keep the work on Opus. They compose.
+`codex-delegate` is the mechanical-implementer step, it lets you hand a single bounded task to Codex and review the diff. `zak-delegator` is the layer above: it tells Claude *when* to call `codex-delegate`, when to route to Sonnet instead, and when to keep the work on Opus. They compose.
 
 **How much does it actually save?**
-Depends on the task. The dominant lever is moving orchestration off Opus — orchestration touches every step, so the saving compounds. On a multi-step feature in my own work the difference is large enough to feel; on a one-step task it's not worth the overhead. Run your own measurements before quoting a number to anyone.
+Depends on the task. The dominant lever is moving orchestration off Opus: orchestration touches every step, so the saving compounds. On a multi-step feature in my own work the difference is large enough to feel; on a one-step task it's not worth the overhead. Run your own measurements before quoting a number to anyone.
 
 **What if the routing is wrong?**
 Every subagent is told to stop and report when confidence drops below ~90%. The orchestrator escalates to Opus on a stop, and to the human on a second stop. This catches the "looked easy, turned out hard" failure mode that pure upfront classification misses.
@@ -197,4 +208,4 @@ Issues and PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the bar a ski
 
 ## Author
 
-**Youssef Eltohamy** ([@Youssef-Eltohamy](https://github.com/Youssef-Eltohamy))
+**Youssef El-Tohamy** ([@Youssef-Eltohamy](https://github.com/Youssef-Eltohamy))
