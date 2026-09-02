@@ -185,7 +185,7 @@ Do not start patching before the root cause is identified.
 
 ## Performance notes
 
-- **Don't run more than 3–4 parallel subagents at once.** The platform allows up to 16, but real throughput plateaus around 4–5 and quality of orchestration drops past that.
+- **Don't run more than 3-4 parallel subagents at once.** The platform allows up to 16, but real throughput plateaus around 4-5 and quality of orchestration drops past that.
 - **Codex is slower per task than Sonnet** but spends a different token bucket. For two adjacent mechanical tasks, send both to Codex in parallel.
 - **If Layer 4 review finds scope drift**, send the offending task back to an *Opus* subagent with a tighter brief, not Sonnet. Scope drift usually means the original brief left too much room for interpretation.
 
